@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+</head>
+<body>
+
+<div id="menu">
+<form name="menu">
+UserID <input type="text" id="userid" value="201"/> <input type="button" name="connect" value="connect"/> <input type="text" id="textforsend" value=""/> <input type="button" name="send" value="send"/>
+</form>
+</div>
+
+<div id="socket-info"></div>
+
+<script>
+
+var socket;
+var url = "ws://host.ru:7777";
+
+function showStatus(message) {
+	var div = document.createElement('div');
+	div.appendChild(document.createTextNode(message));
+	document.getElementById('socket-info').appendChild(div);
+};
+
+function openConnection() {
+	if (socket === undefined || socket.readyState !== 1) {
+		socket = new WebSocket(url);
+	}
+	socket.onclose = function(event) {
+		openConnection();
+	};
+	socket.onmessage = function(event) {
+		showStatus(event.data);
+	}
+	socket.onopen = function(event) {
+		socket.send(document.getElementById("userid").value);
+	};
+	socket.onerror = function(event) {
+		//console.log("WebSocket error: ", event);
+	};
+};
+
+function sendText(e){
+	socket.send(document.getElementById("textforsend").value);
+}
+
+document.menu.connect.addEventListener("click", openConnection);
+document.menu.send.addEventListener("click", sendText);
+
+</script>
+
+
+</body>
+</html>
